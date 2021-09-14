@@ -17,6 +17,16 @@ from utils.general import (
 from utils.torch_utils import select_device, load_classifier, time_synchronized
 
 
+
+def get_dominant_color(input,box):
+    img = input.copy()
+    img = img[int(box[1]):int(box[3]),int(box[0]):int(box[2]),:]
+    print(box)
+    img=cv2.resize(img,(1, 1))
+    dominant_color = [int(img[0][0][0]),int(img[0][0][1]),int(img[0][0][2])] #tuple(img[0][0])
+    print(dominant_color)
+    return dominant_color
+
 def detect(save_img=False):
     out, source, weights, view_img, save_txt, imgsz = \
         opt.output, opt.source, opt.weights, opt.view_img, opt.save_txt, opt.img_size
@@ -106,9 +116,14 @@ def detect(save_img=False):
                         with open(txt_path + '.txt', 'a') as f:
                             f.write(('%g ' * 5 + '\n') % (cls, *xywh))  # label format
 
+                    overlay = im0.copy()
                     if save_img or view_img:  # Add bbox to image
                         label = '%s' % (names[int(cls)])
-                        plot_one_box(xyxy, im0, label=label, color=colors[int(cls)], line_thickness=2)
+                        car_color = get_dominant_color(im0,xyxy)
+                        A=colors[int(cls)]
+                        plot_one_box(xyxy, im0, label=label, color=car_color, line_thickness=2) #colors[int(cls)]
+                    alpha = 0.45  # transparency
+                    im0 = cv2.addWeighted(overlay, alpha, im0, 1 - alpha, 0)
 
             # Print time (inference + NMS)
             print('%sDone. (%.3fs)' % (s, t2 - t1))
@@ -146,8 +161,8 @@ def detect(save_img=False):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--weights', nargs='+', type=str, default='yolov4-p5.pt', help='model.pt path(s)')
-    parser.add_argument('--source', type=str, default='inference/images', help='source')  # file/folder, 0 for webcam
+    parser.add_argument('--weights', nargs='+', type=str, default='models/yolov4-p6.pt', help='model.pt path(s)')
+    parser.add_argument('--source', type=str, default='test2.jpg', help='source')  # file/folder, 0 for webcam
     parser.add_argument('--output', type=str, default='inference/output', help='output folder')  # output folder
     parser.add_argument('--img-size', type=int, default=640, help='inference size (pixels)')
     parser.add_argument('--conf-thres', type=float, default=0.4, help='object confidence threshold')

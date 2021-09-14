@@ -1,0 +1,10 @@
+#folder with test images
+/inference
+
+#images
+*.jpg
+#models
+*.pt
+
+#ide
+*.idea
