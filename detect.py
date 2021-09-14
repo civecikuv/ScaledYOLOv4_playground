@@ -21,10 +21,8 @@ from utils.torch_utils import select_device, load_classifier, time_synchronized
 def get_dominant_color(input,box):
     img = input.copy()
     img = img[int(box[1]):int(box[3]),int(box[0]):int(box[2]),:]
-    print(box)
     img=cv2.resize(img,(1, 1))
     dominant_color = [int(img[0][0][0]),int(img[0][0][1]),int(img[0][0][2])] #tuple(img[0][0])
-    print(dominant_color)
     return dominant_color
 
 def detect(save_img=False):
@@ -121,7 +119,7 @@ def detect(save_img=False):
                         label = '%s' % (names[int(cls)])
                         car_color = get_dominant_color(im0,xyxy)
                         A=colors[int(cls)]
-                        plot_one_box(xyxy, im0, label=label, color=car_color, line_thickness=2) #colors[int(cls)]
+                        plot_one_box(xyxy, im0,label=label, color=car_color, line_thickness=2) #colors[int(cls)]
                     alpha = 0.45  # transparency
                     im0 = cv2.addWeighted(overlay, alpha, im0, 1 - alpha, 0)
 
